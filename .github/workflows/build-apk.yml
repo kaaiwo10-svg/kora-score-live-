@@ -26,19 +26,11 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Backup custom files
-        run: |
-          cp -r lib /tmp/lib_backup
-          cp pubspec.yaml /tmp/pubspec_backup.yaml
-
       - name: Create Flutter project structure
-        run: flutter create . --project-name kora_score_live --org com.korascorelive --platforms android
+        run: flutter create temp_project --project-name kora_score_live --org com.korascorelive --platforms android
 
-      - name: Restore custom files
-        run: |
-          rm -rf lib
-          cp -r /tmp/lib_backup lib
-          cp /tmp/pubspec_backup.yaml pubspec.yaml
+      - name: Copy Android folder
+        run: cp -r temp_project/android ./android
 
       - name: Get dependencies
         run: flutter pub get
