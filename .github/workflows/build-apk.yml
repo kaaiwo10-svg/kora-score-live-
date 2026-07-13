@@ -26,21 +26,23 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Create Flutter project structure
-        run: flutter create temp_project --project-name kora_score_live --org com.korascorelive --platforms android
-
-      - name: Copy Android folder
-        run: cp -r temp_project/android ./android
+      - name: Create full Flutter project in temp folder
+        run: |
+          flutter create /tmp/kora_app --project-name kora_score_live --org com.korascorelive --platforms android
+          cp -r lib /tmp/kora_app/lib
+          cp pubspec.yaml /tmp/kora_app/pubspec.yaml
 
       - name: Get dependencies
+        working-directory: /tmp/kora_app
         run: flutter pub get
 
       - name: Build Debug APK
+        working-directory: /tmp/kora_app
         run: flutter build apk --debug --no-tree-shake-icons
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: KoraScoreLive-APK
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          path: /tmp/kora_app/build/app/outputs/flutter-apk/app-debug.apk
           retention-days: 30
