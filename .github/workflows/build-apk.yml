@@ -13,6 +13,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Debug - show files
+        run: |
+          echo "=== Root files ==="
+          ls -la
+          echo "=== All files recursive ==="
+          find . -name "*.yaml" -o -name "*.dart" | head -30
+
       - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
@@ -26,11 +33,14 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Create full Flutter project in temp folder
+      - name: Create Flutter project and merge
         run: |
           flutter create /tmp/kora_app --project-name kora_score_live --org com.korascorelive --platforms android
-          cp -r lib /tmp/kora_app/lib
-          cp pubspec.yaml /tmp/kora_app/pubspec.yaml
+          rm -rf /tmp/kora_app/lib
+          cp -r $(find . -name "lib" -type d | head -1) /tmp/kora_app/lib
+          PUBSPEC=$(find . -name "pubspec.yaml" | grep -v "/tmp" | head -1)
+          echo "Found pubspec at: $PUBSPEC"
+          cp "$PUBSPEC" /tmp/kora_app/pubspec.yaml
 
       - name: Get dependencies
         working-directory: /tmp/kora_app
